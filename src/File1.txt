@@ -1,0 +1,11 @@
+crypto-forecast-analyzer/
+├── src/
+│   ├── components/       # Reusable UI components
+│   ├── pages/           # Page components
+│   ├── App.tsx          # Main app component
+│   ├── main.tsx         # App entry point
+│   └── styles.css       # Global styles
+├── public/              # Static assets
+├── index.html           # HTML template
+├── vite.config.ts       # Vite configuration
+└── package.json         # Project dependencies
