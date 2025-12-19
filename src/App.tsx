@@ -1,49 +1,33 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { SettingsProvider } from './context/SettingsContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Layout from './components/Layout';
-import LandingPage from './pages/LandingPage';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './pages/Home';
 import Login from './pages/Login';
-import Signup from './pages/Signup';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import Analysis from './pages/Analysis';
 import Forecast from './pages/Forecast';
+import Compare from './pages/Compare';
 import Portfolio from './pages/Portfolio';
-import Settings from './pages/Settings';
-import './index.css';
+import Layout from './components/Layout';
 
-export default function App() {
+function App() {
   return (
-    <AuthProvider>
-      <SettingsProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        <Route path="/app" element={<Layout />}>
+          <Route index element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="forecast" element={<Forecast />} />
+          <Route path="compare" element={<Compare />} />
+          <Route path="portfolio" element={<Portfolio />} />
+        </Route>
 
-            {/* Protected Routes */}
-            <Route
-              path="/app"
-              element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate to="/app/dashboard" replace />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="analysis" element={<Analysis />} />
-              <Route path="forecast" element={<Forecast />} />
-              <Route path="portfolio" element={<Portfolio />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </SettingsProvider>
-    </AuthProvider>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
+
+export default App;

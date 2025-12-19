@@ -1,357 +1,179 @@
-import React, { useState, useEffect } from 'react';
-import { useSettings } from '../context/SettingsContext';
-import { TrendingUp, TrendingDown, AlertCircle, Brain, Zap, Target } from 'lucide-react';
+import { TrendingUp, Calendar, Target, AlertCircle } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+
+const forecastData = [
+  { date: '2024-01', actual: 42000, predicted: 42000, upper: 43000, lower: 41000 },
+  { date: '2024-02', actual: 43500, predicted: 43200, upper: 44500, lower: 42000 },
+  { date: '2024-03', actual: 45000, predicted: 44800, upper: 46200, lower: 43500 },
+  { date: '2024-04', actual: 44200, predicted: 46500, upper: 48000, lower: 45000 },
+  { date: '2024-05', actual: null, predicted: 48000, upper: 50000, lower: 46000 },
+  { date: '2024-06', actual: null, predicted: 50500, upper: 53000, lower: 48000 },
+  { date: '2024-07', actual: null, predicted: 52000, upper: 55000, lower: 49000 },
+];
+
+const predictions = [
+  { 
+    crypto: 'Bitcoin', 
+    symbol: 'BTC', 
+    current: 43250, 
+    predicted: 52000, 
+    change: 20.2,
+    confidence: 85,
+    timeframe: '3 months'
+  },
+  { 
+    crypto: 'Ethereum', 
+    symbol: 'ETH', 
+    current: 2280, 
+    predicted: 2850, 
+    change: 25.0,
+    confidence: 78,
+    timeframe: '3 months'
+  },
+  { 
+    crypto: 'Cardano', 
+    symbol: 'ADA', 
+    current: 0.52, 
+    predicted: 0.68, 
+    change: 30.8,
+    confidence: 72,
+    timeframe: '3 months'
+  },
+];
 
 export default function Forecast() {
-  const { settings } = useSettings();
-  const [hasApiKeys, setHasApiKeys] = useState(false);
-
-  useEffect(() => {
-    // Check if at least one AI provider key is configured
-    const hasAiKey = !!(
-      settings.openAiKey || 
-      settings.geminiKey || 
-      settings.anthropicKey
-    );
-    setHasApiKeys(hasAiKey);
-  }, [settings]);
-
-  const forecasts = [
-    {
-      crypto: 'Bitcoin',
-      symbol: 'BTC',
-      currentPrice: '$43,250',
-      prediction: '$48,500',
-      change: '+12.14%',
-      confidence: 87,
-      timeframe: '7 days',
-      trend: 'up',
-      color: 'from-orange-500 to-yellow-500',
-    },
-    {
-      crypto: 'Ethereum',
-      symbol: 'ETH',
-      currentPrice: '$2,280',
-      prediction: '$2,650',
-      change: '+16.23%',
-      confidence: 82,
-      timeframe: '7 days',
-      trend: 'up',
-      color: 'from-blue-500 to-purple-500',
-    },
-    {
-      crypto: 'Cardano',
-      symbol: 'ADA',
-      currentPrice: '$0.58',
-      prediction: '$0.52',
-      change: '-10.34%',
-      confidence: 75,
-      timeframe: '7 days',
-      trend: 'down',
-      color: 'from-blue-600 to-cyan-500',
-    },
-    {
-      crypto: 'Solana',
-      symbol: 'SOL',
-      currentPrice: '$98.45',
-      prediction: '$112.30',
-      change: '+14.07%',
-      confidence: 79,
-      timeframe: '7 days',
-      trend: 'up',
-      color: 'from-purple-500 to-pink-500',
-    },
-  ];
-
-  if (!hasApiKeys) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            AI-Powered Forecasts
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Machine learning predictions for cryptocurrency price movements
-          </p>
-        </div>
-
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-200 mb-2">
-                API Keys Required
-              </h3>
-              <p className="text-yellow-800 dark:text-yellow-300 mb-4">
-                Configure AI provider API keys in Settings for the most accurate predictions.
-              </p>
-              <div className="space-y-2 text-sm text-yellow-700 dark:text-yellow-400">
-                <p>Required: At least one AI provider key</p>
-                <ul className="list-disc list-inside ml-4 space-y-1">
-                  <li>OpenAI (GPT-4, GPT-3.5)</li>
-                  <li>Google Gemini (Gemini Pro)</li>
-                  <li>Anthropic (Claude)</li>
-                </ul>
-              </div>
-              <a
-                href="/app/settings"
-                className="inline-block mt-4 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
-              >
-                Go to Settings
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Show demo forecasts with overlay */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-gray-900/50 dark:bg-gray-900/70 backdrop-blur-sm z-10 rounded-xl flex items-center justify-center">
-            <div className="text-center text-white">
-              <Brain className="h-12 w-12 mx-auto mb-3" />
-              <p className="text-lg font-semibold">AI Forecasts Locked</p>
-              <p className="text-sm text-gray-300">Configure API keys to unlock</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-50">
-            {forecasts.slice(0, 2).map((forecast) => (
-              <div
-                key={forecast.symbol}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-12 h-12 rounded-full bg-gradient-to-br ${forecast.color} flex items-center justify-center text-white font-bold text-lg`}
-                    >
-                      {forecast.symbol.charAt(0)}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {forecast.crypto}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {forecast.symbol}
-                      </p>
-                    </div>
-                  </div>
-                  {forecast.trend === 'up' ? (
-                    <TrendingUp className="h-6 w-6 text-green-500" />
-                  ) : (
-                    <TrendingDown className="h-6 w-6 text-red-500" />
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Current Price
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {forecast.currentPrice}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Predicted Price
-                    </span>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {forecast.prediction}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Expected Change
-                    </span>
-                    <span
-                      className={`font-semibold ${
-                        forecast.trend === 'up' ? 'text-green-500' : 'text-red-500'
-                      }`}
-                    >
-                      {forecast.change}
-                    </span>
-                  </div>
-
-                  <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Confidence
-                      </span>
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {forecast.confidence}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${forecast.confidence}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Timeframe: {forecast.timeframe}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          AI-Powered Forecasts
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Machine learning predictions for cryptocurrency price movements
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">Price Forecasting</h1>
+          <p className="text-gray-400">AI-powered cryptocurrency price predictions</p>
+        </div>
 
-      {/* AI Status Banner */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
-        <div className="flex items-center gap-4">
-          <div className="flex-shrink-0">
-            <Brain className="h-10 w-10" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-1">AI Analysis Active</h3>
-            <p className="text-indigo-100 text-sm">
-              Using advanced machine learning models to analyze market trends and predict price movements
+        {/* Alert Banner */}
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-8 flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-blue-400 font-semibold mb-1">Forecast Disclaimer</h3>
+            <p className="text-gray-300 text-sm">
+              These predictions are based on historical data and machine learning models. 
+              Cryptocurrency markets are highly volatile. Always do your own research.
             </p>
           </div>
-          <div className="flex gap-2">
-            <div className="flex items-center gap-2 bg-white/20 rounded-lg px-3 py-2">
-              <Zap className="h-4 w-4" />
-              <span className="text-sm font-medium">Real-time</span>
+        </div>
+
+        {/* Main Forecast Chart */}
+        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Bitcoin Price Forecast</h2>
+            <div className="flex items-center space-x-2 text-gray-400">
+              <Calendar className="w-5 h-5" />
+              <span className="text-sm">Next 3 Months</span>
+            </div>
+          </div>
+          
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={forecastData}>
+              <defs>
+                <linearGradient id="colorPredicted" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorConfidence" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="date" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '0.5rem',
+                  color: '#F3F4F6'
+                }} 
+              />
+              <Area type="monotone" dataKey="upper" stroke="none" fill="url(#colorConfidence)" />
+              <Area type="monotone" dataKey="lower" stroke="none" fill="url(#colorConfidence)" />
+              <Line type="monotone" dataKey="actual" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981' }} />
+              <Line type="monotone" dataKey="predicted" stroke="#3B82F6" strokeWidth={2} strokeDasharray="5 5" dot={{ fill: '#3B82F6' }} />
+            </AreaChart>
+          </ResponsiveContainer>
+
+          <div className="flex items-center justify-center space-x-6 mt-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-gray-400">Actual Price</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-gray-400">Predicted Price</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-purple-500/50 rounded-full"></div>
+              <span className="text-gray-400">Confidence Range</span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Forecast Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {forecasts.map((forecast) => (
-          <div
-            key={forecast.symbol}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-12 h-12 rounded-full bg-gradient-to-br ${forecast.color} flex items-center justify-center text-white font-bold text-lg`}
-                >
-                  {forecast.symbol.charAt(0)}
+        {/* Prediction Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {predictions.map((pred) => (
+            <div
+              key={pred.symbol}
+              className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:bg-gray-800/70 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold">{pred.symbol[0]}</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">{pred.crypto}</h3>
+                    <p className="text-sm text-gray-400">{pred.symbol}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {forecast.crypto}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {forecast.symbol}
-                  </p>
+                <TrendingUp className="w-6 h-6 text-green-400" />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm">Current Price</span>
+                  <span className="text-white font-semibold">${pred.current.toLocaleString()}</span>
                 </div>
-              </div>
-              {forecast.trend === 'up' ? (
-                <TrendingUp className="h-6 w-6 text-green-500" />
-              ) : (
-                <TrendingDown className="h-6 w-6 text-red-500" />
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Current Price
-                </span>
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  {forecast.currentPrice}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Predicted Price
-                </span>
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  {forecast.prediction}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Expected Change
-                </span>
-                <span
-                  className={`font-semibold ${
-                    forecast.trend === 'up' ? 'text-green-500' : 'text-red-500'
-                  }`}
-                >
-                  {forecast.change}
-                </span>
-              </div>
-
-              <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    Confidence
-                  </span>
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {forecast.confidence}%
-                  </span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm">Predicted Price</span>
+                  <span className="text-blue-400 font-semibold">${pred.predicted.toLocaleString()}</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${forecast.confidence}%` }}
-                  />
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm">Expected Change</span>
+                  <span className="text-green-400 font-semibold">+{pred.change}%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm">Timeframe</span>
+                  <span className="text-gray-300 text-sm">{pred.timeframe}</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Timeframe: {forecast.timeframe}
-                </span>
-                <div className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400">
-                  <Target className="h-3 w-3" />
-                  <span>AI Powered</span>
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-2">
+                    <Target className="w-4 h-4 text-purple-400" />
+                    <span className="text-gray-400 text-sm">Confidence</span>
+                  </div>
+                  <span className="text-purple-400 font-semibold">{pred.confidence}%</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all"
+                    style={{ width: `${pred.confidence}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Additional Info */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
-            <AlertCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-2">
-              About AI Forecasts
-            </h3>
-            <p className="text-blue-800 dark:text-blue-300 text-sm">
-              Our AI models analyze historical price data, market sentiment, trading volumes, and
-              technical indicators to generate predictions. Confidence scores reflect the model's
-              certainty based on data quality and market volatility.
-            </p>
-            <p className="text-blue-700 dark:text-blue-400 text-xs mt-2">
-              ⚠️ Disclaimer: Predictions are for informational purposes only and should not be
-              considered financial advice.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     </div>
